@@ -5,15 +5,18 @@ from datetime import datetime
 per_km_cost = 0
 distances = []
 
+##Função para limpar a tela independente do OS
 def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
 
+##Função para logar em um arquivo {data}.log
 def log(string):
     now = datetime.now()
     f = open(now.strftime('%Y-%m-%d') + '.log', 'a')
     f.write(now.strftime('%H:%M:%S') + string + '\n')
     f.close()
 
+##Função para abrir o CSV distancias.csv
 def openCSV():
     f = open('distancias.csv')
     reader = csv.reader(f, delimiter=';')
@@ -21,17 +24,17 @@ def openCSV():
     distances = list(reader)
     f.close()
     
-
+#Função executada no início do programa para alterar o custo por KM. O valor pode ser alterado após, durante a execução do mesmo
 def alterarCustoPorKM():
     cls()
-    print("Bem vindo ao sistema de gerenciamneto logístico\n\rPara inicialização do programa, precisamos que você informe o custo por kilômetro rodado, em R$.")
+    print("Bem vindo ao sistema de gerenciamneto logístico\n\rPrecisamos que você informe o custo por kilômetro rodado, em R$.")
     km_cost = '0'
-    while not isinstance(km_cost, float):
+    while not isinstance(km_cost, float): ##Enquanto o tipo de dado não conseguir ser convertido para float, o input volta a aparecer
         km_cost = input('Custo por Kilômetro: R$')
 
-        try:
-            km_cost = float(km_cost)
-        except:
+        try:    ##tenta fazer conversão para float
+            km_cost = float(km_cost) 
+        except: ##Caso não consiga, continua execução do programa sem crashá-lo
             cls()
             print('Valor inválido, Digite um número válido.')
 
@@ -40,20 +43,25 @@ def alterarCustoPorKM():
     log('[INFO] O valor do custo por km foi alterado para R${:.2f}'.format(per_km_cost))
     cls()
 
+##Função auxiliar para verificar distância entre cidade de origem e destino.
+##Os argumentos podem ser tanto o nome da cidade (string) em letra minúscula/maiúscula, mas também pode ser o índice da cidade na lista de cidades.
 def verificarDistancia(origem, destino):
     if isinstance(origem, int) and isinstance(destino, int):
         return int(distances[destino+1][origem])
     else:
-        origem_index = distances[0].index(origem.upper())
-        destino_index = distances[0].index(destino.upper())
+        origem_index = distances[0].index(origem.upper()) ##Recebe o índice da cidade de origem
+        destino_index = distances[0].index(destino.upper()) ##Recebe o índice da cidade de destino
         return int(distances[destino_index+1][origem_index])
 
+##Função auxiliar para verificar a existência da cidade na lista de cidades.
+##Leva como argumento o nome da cidade
 def verificarCidade(cidade):
     if cidade.upper() in distances[0]:
         return True
     else:
         return False
 
+##função referente a opção 2
 def consultarTrecho():
     flag = True
     cls()
@@ -75,6 +83,7 @@ def consultarTrecho():
     input("Digite qualquer coisa para continuar: ")
     cls()
 
+##Função referente a opção 3
 def melhorRota():
     flag = True
     cls()
@@ -83,12 +92,11 @@ def melhorRota():
         cidades = cidades.split(',')
         
         if len(cidades) == 3:
-            if not (cidades[0] == cidades[1] or cidades[0] == cidades[2] or cidades[1] == cidades[2]):
+            if not (cidades[0] == cidades[1] or cidades[0] == cidades[2] or cidades[1] == cidades[2]): ##Valida que nenhuma das cidades é igual
                 if verificarCidade(cidades[0]) and verificarCidade(cidades[1]) and verificarCidade(cidades[2]):
                     flag = False
                 else:
                     cls()
-                    ##print(cidades[0] in distances[0], cidades[1] in distances[0], cidades[2] in distances[0], cidades, distances[0])
                     print('Uma ou mais cidades que você digitou não constam na lista de cidades disponíveis.')
                     return
             else:
@@ -99,11 +107,12 @@ def melhorRota():
             cls()
             print('Você não digitou 3 cidades separadas por uma vírgula, tente novamente.')
 
-    distance_AB = verificarDistancia(cidades[0], cidades[1])
+    distance_AB = verificarDistancia(cidades[0], cidades[1]) 
     distance_BC = verificarDistancia(cidades[1], cidades[2])
     distance_AC = verificarDistancia(cidades[0], cidades[2])
 
-    if (distance_AC + distance_BC) < (distance_AB + distance_BC):
+    ##Relacional que irá definir a string que será logada e exibida em tela
+    if (distance_AC + distance_BC) < (distance_AB + distance_BC): ##Verifica qual a maior distância entre as somas dos lados de um triângulo
         distancia_total = distance_AC+distance_BC
         string1 = '{}  === {} ===  {}  === {} ===  {}'.format(cidades[0], distance_AC, cidades[2], distance_BC, cidades[1])
         string2 = 'Distância total percorrida: {:d}km. O valor total gasto no trajeto é de R${:.2f}'.format(distancia_total, distancia_total*per_km_cost)
@@ -119,6 +128,8 @@ def melhorRota():
     input('\n\nDigite qualquer coisa para continuar: ')
     cls()
 
+
+##Função referente a opção 4
 def rotaCompleta():
     flag = True
     cls()
@@ -141,9 +152,13 @@ def rotaCompleta():
     
     cls()
     distancia_total = 0
+
     print("|De----------------|Para--------------|Km---------|")
     log('[INFO]' + "|De----------------|Para--------------|Km---------|")
-    for i in range(len(cidades)-1):
+
+
+    ##Percorre o array de cidades somando a distancia final
+    for i in range(len(cidades)-1): 
         string = "|{:18}|{:18}|{:>11}|".format(cidades[i], cidades[i+1], verificarDistancia(cidades[i],cidades[i+1]))
         print(string)
         log("[INFO]" + string)
@@ -164,12 +179,14 @@ def rotaCompleta():
     input('Digite qualquer coisa para continuar: ')
     cls()
 
+##Função referente a opção 5
 def mostrarCidades():
     cls()
     print('\n'.join(distances[0]))
     input('Digite qualquer coisa para continuar: ')
     cls()
 
+##Execução do menu
 def menu():
     user_choice = '0'
     cls()
