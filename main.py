@@ -49,9 +49,8 @@ def verificarDistancia(origem, destino):
         return int(distances[destino_index+1][origem_index])
 
 def verificarCidade(cidade):
-    print(distances)
     if cidade.upper() in distances[0]:
-        return distances[0].index(cidade.upper())
+        return True
     else:
         return False
 
@@ -85,7 +84,7 @@ def melhorRota():
         
         if len(cidades) == 3:
             if not (cidades[0] == cidades[1] or cidades[0] == cidades[2] or cidades[1] == cidades[2]):
-                if cidades[0].upper() in distances[0] and cidades[1].upper() in distances[0] and cidades[2].upper() in distances[0]:
+                if verificarCidade(cidades[0]) and verificarCidade(cidades[1]) and verificarCidade(cidades[2]):
                     flag = False
                 else:
                     cls()
