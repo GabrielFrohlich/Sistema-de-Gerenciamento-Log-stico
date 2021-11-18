@@ -215,6 +215,12 @@ def menu():
             return
 
 ##Execução principal do código (main)
-openCSV()
+try:
+    openCSV()
+except:
+    cls()
+    input('Ocorreu um erro ao importar o CSV, verifique se o arquivo "distancias.csv" está na raiz do projeto.\n')
+    exit()
+
 alterarCustoPorKM()
 menu()
